@@ -1,0 +1,12 @@
+syntax = "proto3";
+package com.jl.entity;
+// 消息体
+message Model {
+  // event 表示各种事件
+  int32 event = 1;
+  string sendUid = 2;
+  string receiver = 3;//接收人用户id
+  int64 sendTime = 4; // 发送时间
+  string messageId = 5;
+  bytes content = 6;//消息体
+}

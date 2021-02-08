@@ -1,0 +1,18 @@
+
+
+server:
+#  ssl:
+#    key-store: classpath:keystore.jks
+#    key-store-type: JKS
+#    key-alias: kurento-selfsigned
+#    key-store-password: kurento
+
+  port: 17770
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+  application:
+    name: gateway

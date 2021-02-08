@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jl.common.dao.ChatRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jl.common.entity.ChatRecord">
+        <id column="id" property="id" />
+        <result column="send_uid" property="sendUid" />
+        <result column="receive_uid" property="receiveUid" />
+        <result column="ack" property="ack" />
+        <result column="send_time" property="sendTime" />
+        <result column="ack_time" property="ackTime" />
+        <result column="msg_body" property="msgBody" />
+        <result column="msg_type" property="msgType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, send_uid, receive_uid, ack, send_time, ack_time, msg_body, msg_type
+    </sql>
+    <select id="recoveryFriendRecord" resultType="com.jl.common.vo.UnreadMessageVo">
+                select
+            a.*,
+            (
+                case
+                    when a.send_uid = #{uid} then '1'
+                    else '0'
+                    end
+            ) as type
+        from chat_record a
+        where
+
+            ( a.send_uid = #{uid} or receive_uid = #{uid} )
+
+           and
+           (
+                a.send_uid in
+                <foreach collection="receiver" item="item" open="(" close=")" separator=",">
+                            #{item}
+                </foreach>
+
+                or
+                a.receive_uid in
+                <foreach collection="receiver" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+           )
+
+    </select>
+
+</mapper>

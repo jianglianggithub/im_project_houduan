@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jl.common.dao.UserFirendsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jl.common.entity.UserFirends">
+        <id column="id" property="id" />
+        <result column="uid" property="uid" />
+        <result column="firend_id" property="firendId" />
+        <result column="ext_name" property="extName" />
+        <result column="add_time" property="addTime" />
+        <result column="remove_time" property="removeTime" />
+        <result column="state" property="state" />
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="userInfoBaseResultMap" type="com.jl.common.entity.UserInfo">
+        <id column="id" property="id" />
+        <result column="uname" property="uname" />
+        <result column="pwd" property="pwd" />
+        <result column="image" property="image" />
+        <result column="last_login_time" property="lastLoginTime" />
+        <result column="birthday" property="birthday" />
+        <result column="like_name" property="likeName" />
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, uid, firend_id, ext_name,add_time,remove_time,state
+    </sql>
+
+    <select id="getFriends" resultType="com.jl.common.vo.FriendAndFriendInfoVo" >
+
+
+        select
+
+        a.firend_id,
+        a.last_time,
+        b.msg_body as last_msg,
+
+        c.image,
+        c.like_name
+        from (
+
+        select * from (
+        select
+        a.uid,a.firend_id,max(c.send_time) as last_time
+        from user_firends a left join user_info b
+        on a.firend_id = b.id
+        left join chat_record c
+        on
+        ( c.send_uid = a.uid and c.receive_uid = a.firend_id )
+        or
+        ( c.send_uid = a.firend_id and c.receive_uid = a.uid )
+        and state = 1
+        where a.uid = #{userId}
+        group by a.uid,a.firend_id
+        ) a where a.last_time is not null
+
+
+        )  a , chat_record b, user_info c
+        where
+
+        (
+        (a.uid = b.send_uid and a.firend_id = b.receive_uid )
+        or
+        (a.uid = b.receive_uid and a.firend_id = b.send_uid )
+        )
+
+        and
+        a.last_time = b.send_time
+        and
+        a.firend_id = c.id
+
+    </select>
+
+
+
+
+
+
+
+
+
+
+    <resultMap id="userInfoBaseResultMap1" type="com.jl.common.entity.UserInfo">
+        <id column="f_id" property="id" />
+        <result column="f_uname" property="uname" />
+        <result column="f_pwd" property="pwd" />
+        <result column="f_image" property="image" />
+        <result column="f_last_login_time" property="lastLoginTime" />
+        <result column="f_birthday" property="birthday" />
+        <result column="f_like_name" property="likeName" />
+    </resultMap>
+
+
+    <resultMap id="MailListVo" type="com.jl.common.vo.MailListVo">
+        <association resultMap="BaseResultMap"
+                     property="userFirends"
+                     javaType="com.jl.common.entity.UserFirends" />
+        <association resultMap="userInfoBaseResultMap1"
+                     property="userInfo"
+                     javaType="com.jl.common.entity.UserInfo" />
+    </resultMap>
+
+    <select id="getMailList" resultMap="MailListVo">
+            select
+            a.uid, a.firend_id, a.ext_name,a.add_time,a.remove_time,a.state,
+
+            b.id as f_id,
+            b.uname as f_uname,
+            b.pwd as f_pwd,
+            b.image as f_image,
+            b.last_login_time as f_last_login_time,
+            b.birthday as f_birthday,
+            b.like_name as f_like_name
+
+            from user_firends a left join user_info b
+            on a.firend_id = b.id
+            where a.uid = #{userId}
+            and state = 1
+
+    </select>
+
+
+</mapper>

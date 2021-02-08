@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jl.common.dao.UserInfoMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jl.common.entity.UserInfo">
+        <id column="id" property="id"/>
+        <result column="uname" property="uname"/>
+        <result column="pwd" property="pwd"/>
+        <result column="image" property="image"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="birthday" property="birthday"/>
+        <result column="like_name" property="likeName"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        uname,
+        pwd,
+        image,
+        last_login_time,
+        birthday,
+        like_name
+    </sql>
+
+    <resultMap id="BaseResultMap_chatMsg" type="com.jl.common.entity.ChatRecord">
+        <id column="id" property="id"/>
+        <result column="send_uid" property="sendUid"/>
+        <result column="receive_uid" property="receiveUid"/>
+        <result column="ack" property="ack"/>
+        <result column="send_time" property="sendTime"/>
+        <result column="ack_time" property="ackTime"/>
+        <result column="msg_body" property="msgBody"/>
+        <result column="msg_type" property="msgType"/>
+    </resultMap>
+
+
+    <select id="getUnreadMessageList" resultType="com.jl.common.vo.UnreadMessageVo">
+        select a.*, '0' as type
+        from chat_record a
+        where  a.receive_uid = #{userId}
+        and ack = 0
+    </select>
+    <select id="getUnreadMessageList2" resultType="java.util.HashMap">
+        select a.*, '0' as type
+        from chat_record a
+        where  a.receive_uid = #{userId}
+           and ack = 0
+    </select>
+</mapper>
